@@ -23,19 +23,35 @@ async function run() {
   try {
     const db = client.db("greenFabricDB");
     const tShirtCollection = db.collection("t-shirts");
+    const categoriesCollection = db.collection("categories");
 
     //? T-shirts apis in here
     // get t-shirts
     app.get("/t-shirts", async (req, res) => {
-      const { isFeatured, limit = 0 } = req.query;
-
+      const {
+        isFeatured,
+        limit = 0,
+        email,
+        sort = "createdAt",
+        order = "desc",
+        category,
+      } = req.query;
+      const sortOption = {};
+      sortOption[sort || "createdAt"] = order === "asc" ? 1 : -1;
       const query = {};
       if (isFeatured || limit) {
         query.isFeatured = true;
       }
+      if (email) {
+        query.email = email;
+      }
+      if (category) {
+        query.category = category;
+      }
+
       const result = await tShirtCollection
         .find(query)
-        .sort({ createdAt: -1 })
+        .sort(sortOption)
         .limit(Number(limit))
         .toArray();
       res.status(200).json(result);
@@ -53,7 +69,6 @@ async function run() {
     app.post("/t-shirts", async (req, res) => {
       const newTShirt = req.body;
       newTShirt.createdAt = new Date().toISOString();
-      newTShirt.orderStatus = "pending";
       const result = await tShirtCollection.insertOne(newTShirt);
       res.status(201).json(result);
     });
@@ -64,6 +79,12 @@ async function run() {
       const query = { _id: new ObjectId(id) };
       const result = await tShirtCollection.deleteOne(query);
       res.send(result);
+    });
+
+    //? categories
+    app.get("/categories", async (req, res) => {
+      const result = await categoriesCollection.find().toArray();
+      res.json(result);
     });
 
     await client.db("admin").command({ ping: 1 });
