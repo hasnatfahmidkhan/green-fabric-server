@@ -3,7 +3,7 @@ const express = require("express");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const cors = require("cors");
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
@@ -27,7 +27,17 @@ async function run() {
     //? T-shirts apis in here
     // get t-shirts
     app.get("/t-shirts", async (req, res) => {
-      const result = await tShirtCollection.find().toArray();
+      const { isFeatured, limit = 0 } = req.query;
+
+      const query = {};
+      if (isFeatured || limit) {
+        query.isFeatured = true;
+      }
+      const result = await tShirtCollection
+        .find(query)
+        .sort({ createdAt: -1 })
+        .limit(Number(limit))
+        .toArray();
       res.status(200).json(result);
     });
 
