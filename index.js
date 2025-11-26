@@ -24,6 +24,7 @@ async function run() {
     const db = client.db("greenFabricDB");
     const tShirtCollection = db.collection("t-shirts");
     const categoriesCollection = db.collection("categories");
+    const reviewsCollection = db.collection("reviews");
 
     //? T-shirts apis in here
     // get t-shirts
@@ -84,6 +85,12 @@ async function run() {
     //? categories
     app.get("/categories", async (req, res) => {
       const result = await categoriesCollection.find().toArray();
+      res.json(result);
+    });
+
+    // reviews
+    app.get("/reviews", async (req, res) => {
+      const result = await reviewsCollection.find().toArray();
       res.json(result);
     });
 
