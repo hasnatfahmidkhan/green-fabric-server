@@ -36,10 +36,16 @@ async function run() {
         sort = "createdAt",
         order = "desc",
         category,
+        search,
       } = req.query;
       const sortOption = {};
       sortOption[sort || "createdAt"] = order === "asc" ? 1 : -1;
       const query = {};
+
+      if (search) {
+        query.category = { $regex: search, $options: "i" };
+      }
+
       if (isFeatured || limit) {
         query.isFeatured = true;
       }
