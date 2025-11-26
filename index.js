@@ -26,7 +26,6 @@ async function run() {
     const categoriesCollection = db.collection("categories");
     const reviewsCollection = db.collection("reviews");
 
-    //? T-shirts apis in here
     // get t-shirts
     app.get("/t-shirts", async (req, res) => {
       const {
