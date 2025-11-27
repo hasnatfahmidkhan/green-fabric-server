@@ -42,7 +42,11 @@ async function run() {
       const query = {};
 
       if (search) {
-        query.title = { $regex: search, $options: "i" };
+        query.$or = [
+          { title: { $regex: search, $options: "i" } },
+          { category: { $regex: search, $options: "i" } },
+          { shortDescription: { $regex: search, $options: "i" } },
+        ];
       }
 
       if (isFeatured || limit) {
